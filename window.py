@@ -2,6 +2,7 @@ import os
 import sys
 import pygame
 from pygame.locals import *
+import color
 
 
 class Window:
@@ -38,21 +39,17 @@ class Window:
     # draws the grid according to the screen size
     def draw_grid(self):
 
-        rect_color = (255, 255, 255)
         for x in range(0, self.WIDTH, self.cell_width):
             for y in range(0, self.HEIGHT, self.cell_height):
                 rect = pygame.Rect(x, y, self.cell_width, self.cell_height)
                 self.grid.append([[x, x + self.cell_width], [y, y + self.cell_height]])
-                pygame.draw.rect(self.display, rect_color, rect, self.GRID_CELL_WIDTH)
+                pygame.draw.rect(self.display, color.WHITE, rect, self.GRID_CELL_WIDTH)
 
     # checks for which grid you clicked in
     def check_click(self, pos):
 
         # Values to store clicking and drawing
         padding_adjustment = self.GRID_CELL_WIDTH + 3
-        color_select = (255, 30, 180)
-        color_white = (255, 255, 255)
-        color_black = (0, 0, 0)
         rect_display = pygame.Rect(0, 0, self.WIDTH, self.HEIGHT)
 
         coordinate = 0
@@ -64,8 +61,8 @@ class Window:
                         if pos[1] < item[1][1] - padding_adjustment:
                             print(coordinate) #print place debug
                             new_rect = pygame.Rect(item[0][0], item[1][0], self.cell_width, self.cell_height)
-                            pygame.draw.rect(self.display, color_black, rect_display)
+                            pygame.draw.rect(self.display, color.BLACK, rect_display)
                             self.draw_grid()
-                            pygame.draw.rect(self.display, color_select, new_rect, self.GRID_CELL_WIDTH + 2)
+                            pygame.draw.rect(self.display, color.HOT_PINK, new_rect, self.GRID_CELL_WIDTH + 2)
                             self.last_loc = [item[0][0], item[1][0]]
                             break
