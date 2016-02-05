@@ -50,8 +50,10 @@ class Window:
 
         # Values to store clicking and drawing
         padding_adjustment = self.GRID_CELL_WIDTH + 3
-        new_color = (255, 30, 180)
-        rect_color = (255, 255, 255)
+        color_select = (255, 30, 180)
+        color_white = (255, 255, 255)
+        color_black = (0, 0, 0)
+        rect_display = pygame.Rect(0, 0, self.WIDTH, self.HEIGHT)
 
         coordinate = 0
         for item in self.grid:
@@ -62,9 +64,8 @@ class Window:
                         if pos[1] < item[1][1] - padding_adjustment:
                             print(coordinate) #print place debug
                             new_rect = pygame.Rect(item[0][0], item[1][0], self.cell_width, self.cell_height)
-                            cell_width = self.cell_width
-                            cell_height = self.cell_height
-                            last_rect = pygame.Rect(self.last_loc[0], self.last_loc[1], cell_width, cell_height)
-                            pygame.draw.rect(self.display, new_color, new_rect, self.GRID_CELL_WIDTH)
-                            pygame.draw.rect(self.display, rect_color, last_rect, self.GRID_CELL_WIDTH)
+                            pygame.draw.rect(self.display, color_black, rect_display)
+                            self.draw_grid()
+                            pygame.draw.rect(self.display, color_select, new_rect, self.GRID_CELL_WIDTH + 2)
                             self.last_loc = [item[0][0], item[1][0]]
+                            break
