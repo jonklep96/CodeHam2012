@@ -1,6 +1,7 @@
 import sys
 import pygame
 import color
+import main_menu
 
 pygame.init()
 
@@ -11,7 +12,7 @@ class Window:
 
         self.width = 600
         self.height = 600
-        self.CELL_HOR = 10
+        self.CELL_HOR = 15
         self.CELL_VER = 15
         self.cell_width = int(self.width / self.CELL_HOR)
         self.cell_height = int(self.height / self.CELL_VER)
@@ -20,6 +21,9 @@ class Window:
         self.screen_label = 'Code Ham Game'
         pygame.display.set_caption(self.screen_label)
         self.screen = pygame.display.set_mode((self.width, self.height))
+
+        # Create a main menu
+        main_menu.start_menu(self.screen)
 
         # Create a background Surface
         self.s_background = pygame.Surface((self.width, self.height))
@@ -55,7 +59,7 @@ class Window:
                     pos = pygame.mouse.get_pos()
                     print(pos)  # debug mouse position
                     self.check_click(pos)
-                elif event.type == pygame.QUIT:
+                if event.type == pygame.QUIT:
                     sys.exit()
             pygame.display.flip()
 

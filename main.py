@@ -1,4 +1,4 @@
-from window import Window
+import window
 
 # Create a window
-window = Window()
+window.Window()
