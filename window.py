@@ -4,6 +4,8 @@ import pygame
 from pygame.locals import *
 import color
 from player import Player
+from unit import Unit
+import unit
 
 
 class Window:
@@ -19,6 +21,7 @@ class Window:
         self.display_label = 'Code Ham Game'
         self.display = pygame.display.set_mode(self.display_size)
         pygame.display.set_caption(self.display_label)
+        unit.play_music()
 
         # List to store cell coordinates
         self.grid = []
@@ -36,6 +39,10 @@ class Window:
                 if event.type == pygame.QUIT:
                     sys.exit()
             pygame.display.update()
+
+
+
+
 
     # draws the grid according to the screen size
     def draw_grid(self):

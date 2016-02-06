@@ -20,6 +20,11 @@ class Unit(pygame.sprite.Sprite):
                 image.set_colorkey(colorkey, RLEACCEL)
             return image, image.get_rect()
 
+#A method that plays a sound object into the game.
+def play_music():
+    pygame.mixer.music.load('assets/music.ogg')
+    pygame.mixer.music.play(-1)
+    pygame.mixer.music.get_pos()
 
 
    # def draw_image(self, surface, rect):

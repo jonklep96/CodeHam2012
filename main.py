@@ -9,4 +9,6 @@ from window import Window
 pygame.init()
 
 # Create a window
+
 window = Window()
+
