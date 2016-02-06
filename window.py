@@ -16,13 +16,13 @@ class Window:
 
         self.width = 600
         self.height = 600
-        self.CELL_HOR = 10
+        self.CELL_HOR = 15
         self.CELL_VER = 15
         self.cell_width = int(self.width / self.CELL_HOR)
         self.cell_height = int(self.height / self.CELL_VER)
 
         # Create a window with the Surface screen
-        self.screen_label = 'Code Ham Game'
+        self.screen_label = 'BytBot'
         pygame.display.set_caption(self.screen_label)
         self.screen = pygame.display.set_mode((self.width, self.height))
 
@@ -64,9 +64,12 @@ class Window:
         self.byt_list = pygame.sprite.Group()
 
         #Draw Characters - Initial
-        byt = Unit(pygame.Rect(20, 20, 32, 32), 'byt')
-        self.byt_list.add(byt)
-        self.byt_list.draw(self.screen)
+        self.byt = Unit(self.grid[32], 'byt', 'Byt')
+        bot = Unit(self.grid[20], 'bot', 'Bot')
+        self.byt_list.add(self.byt)
+        self.bot_list.add(bot)
+        self.draw_group(self.bot_list)
+        self.draw_group(self.byt_list)
 
         while True:
             for event in pygame.event.get():
@@ -104,6 +107,7 @@ class Window:
                 if self.is_movable(grid_index, self.last_loc):
                     print(grid_index)  # debug cell index
                     sel_cell = pygame.Rect(item.x, item.y, self.cell_width, self.cell_height)
+                    self.byt.rect = pygame.Rect(sel_cell.x, sel_cell.y, self.byt.rect.width, self.byt.rect.height)
                     self.draw_grid(False)
 
                     # Selectable grid choices
@@ -128,6 +132,7 @@ class Window:
                     if self.is_movable(grid_index - self.CELL_VER, grid_index):
                         pygame.draw.rect(self.screen, color.BLUE, self.sel_cells[3], sel_width)
                     pygame.draw.rect(self.screen, color.YELLOW, sel_cell, sel_width + 1)
+                    self.draw_group(self.byt_list)
                     self.last_loc = grid_index
             grid_index += 1
 
@@ -177,4 +182,12 @@ class Window:
 
         return False
 
-    #def draw_image(self, name):
+    def draw_group(self, group):
+        t_group = group.copy()
+        for sprite in t_group.sprites():
+            t_x = sprite.rect.x + int((self.cell_width - sprite.rect.width) / 2)
+            t_y = sprite.rect.y + int((self.cell_height - sprite.rect.height) / 2)
+            t_rect = pygame.Rect(t_x, t_y, sprite.rect.width, sprite.rect.height)
+            sprite.rect = t_rect
+            t_group.add(sprite)
+        t_group.draw(self.screen)
