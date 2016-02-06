@@ -9,18 +9,17 @@ class Window:
 
     def __init__(self):
 
-        self.width = 540
-        self.height = 540
-        self.CELL_HOR = 15
+        self.width = 600
+        self.height = 600
+        self.CELL_HOR = 10
         self.CELL_VER = 15
-        self.OUTER_CELLS = 2
         self.cell_width = int(self.width / self.CELL_HOR)
         self.cell_height = int(self.height / self.CELL_VER)
 
         # Create a window with the Surface screen
         self.screen_label = 'Code Ham Game'
         pygame.display.set_caption(self.screen_label)
-        self.screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE)
+        self.screen = pygame.display.set_mode((self.width, self.height))
 
         # Create a background Surface
         self.s_background = pygame.Surface((self.width, self.height))
@@ -30,18 +29,25 @@ class Window:
 
         # Create a grid Surface
         self.s_grid = pygame.Surface((self.width, self.height))
-        self.s_grid = self.s_grid.convert(self.s_background)
+        self.s_grid = self.s_grid.convert(self.screen)
+        self.s_grid.set_alpha(180)
         self.grid_x = 0
         self.grid_y = 0
 
         # List to store cell coordinates
         self.grid = []
         self.sel_cells = [0]*4
-        self.last_loc = [0, 0]
 
         # Constant of the cell border width
+        self.OUTER_CELLS = 2
         self.GRID_CELL_WIDTH = 2
         self.draw_grid(True)
+
+        # Stores the index of the starting location and the previous location
+        self.last_loc = self.CELL_VER * 2 + self.OUTER_CELLS
+
+        # Draw the layers to the screen
+        self.draw_layers()
 
         while True:
             for event in pygame.event.get():
@@ -49,36 +55,26 @@ class Window:
                     pos = pygame.mouse.get_pos()
                     print(pos)  # debug mouse position
                     self.check_click(pos)
-                elif event.type == pygame.VIDEORESIZE:
-                    self.init_sizes(event)
-                    sub_width = self.s_grid.get_width()
-                    sub_height = self.s_grid.get_height()
-                    self.grid_x = int(self.width - sub_width) / 2
-                    self.grid_y = int(self.height - sub_height) / 2
-                    self.screen.blit(self.s_grid, (self.grid_x, self.grid_y))
-                    self.draw_grid(False)
-                    print('Screen Change')
                 elif event.type == pygame.QUIT:
                     sys.exit()
             pygame.display.flip()
-
-    def init_sizes(self, event):
-
-        size = [event.w, event.h]
-        self.width = size[0]
-        self.height = size[1]
 
     # draws the grid according to the screen size
     # during the first_run, draw_grid will add the
     # rects to a list
     def draw_grid(self, first_run):
 
+        grid_index = 0
         for x in range(0, self.width, self.cell_width):
             for y in range(0, self.height, self.cell_height):
                 rect = pygame.Rect(x, y, self.cell_width, self.cell_height)
                 if first_run:
                     self.grid.append(rect)
-                pygame.draw.rect(self.s_grid, color.WHITE, rect, self.GRID_CELL_WIDTH)
+                if self.is_outer_border(grid_index):
+                    pygame.draw.rect(self.s_grid, color.OFF_WHITE, rect, self.GRID_CELL_WIDTH)
+                else:
+                    pygame.draw.rect(self.s_grid, color.WHITE, rect, self.GRID_CELL_WIDTH)
+                grid_index += 1
 
     # checks for which grid you clicked in
     def check_click(self, pos):
@@ -86,22 +82,34 @@ class Window:
         grid_index = 0
         for item in self.grid:
             if self.rect_contain(item, pos):
-                print(grid_index)  # print place debug
-                new_rect = pygame.Rect(item.x, item.y, self.cell_width, self.cell_height)
-                self.clear_window()
-                self.draw_grid(False)
-                # Selectable grid choices
-                self.sel_cells[0] = self.grid[grid_index - 1]
-                self.sel_cells[1] = self.grid[grid_index + self.CELL_HOR]
-                self.sel_cells[2] = self.grid[grid_index + 1]
-                self.sel_cells[3] = self.grid[grid_index - self.CELL_HOR]
-                # Draw the selectable locations
-                pygame.draw.rect(self.s_grid, color.BLUE, self.sel_cells[0], self.GRID_CELL_WIDTH + 1)
-                pygame.draw.rect(self.s_grid, color.BLUE, self.sel_cells[1], self.GRID_CELL_WIDTH + 1)
-                pygame.draw.rect(self.s_grid, color.BLUE, self.sel_cells[2], self.GRID_CELL_WIDTH + 1)
-                pygame.draw.rect(self.s_grid, color.BLUE, self.sel_cells[3], self.GRID_CELL_WIDTH + 1)
-                pygame.draw.rect(self.s_grid, color.YELLOW, new_rect, self.GRID_CELL_WIDTH + 2)
-                self.last_loc = item
+                if self.is_movable(grid_index, self.last_loc):
+                    print(grid_index)  # debug cell index
+                    sel_cell = pygame.Rect(item.x, item.y, self.cell_width, self.cell_height)
+                    self.draw_grid(False)
+
+                    # Selectable grid choices
+                    self.sel_cells[0] = self.grid[grid_index - 1]
+                    self.sel_cells[1] = self.grid[grid_index + self.CELL_VER]
+                    self.sel_cells[2] = self.grid[grid_index + 1]
+                    self.sel_cells[3] = self.grid[grid_index - self.CELL_VER]
+
+                    # Remove the previous selected cells
+                    self.draw_layers()
+
+                    # Width of cell selection
+                    sel_width = self.GRID_CELL_WIDTH + 2
+
+                    # Draw the selectable locations
+                    if self.is_movable(grid_index - 1, grid_index):
+                        pygame.draw.rect(self.screen, color.BLUE, self.sel_cells[0], sel_width)
+                    if self.is_movable(grid_index + self.CELL_VER, grid_index):
+                        pygame.draw.rect(self.screen, color.BLUE, self.sel_cells[1], sel_width)
+                    if self.is_movable(grid_index + 1, grid_index):
+                        pygame.draw.rect(self.screen, color.BLUE, self.sel_cells[2], sel_width)
+                    if self.is_movable(grid_index - self.CELL_VER, grid_index):
+                        pygame.draw.rect(self.screen, color.BLUE, self.sel_cells[3], sel_width)
+                    pygame.draw.rect(self.screen, color.YELLOW, sel_cell, sel_width + 1)
+                    self.last_loc = grid_index
             grid_index += 1
 
     # Check to see if the position was inside the specified cell
@@ -118,18 +126,33 @@ class Window:
         else:
             return False
 
+    def is_outer_border(self, index):
+
+        outer_cells = self.OUTER_CELLS
+        cell_hor = self.CELL_HOR
+        cell_ver = self.CELL_VER
+
+        if index >= (outer_cells * cell_ver):
+            if index < ((cell_hor * cell_ver) - (outer_cells * cell_ver)):
+                if outer_cells <= (index % cell_ver) < (cell_ver - outer_cells):
+                    return False
+
+        return True
+
     def draw_layers(self):
 
-        self.screen.blit(self.s_background, (self.width, self.height))
+        self.screen.blit(self.s_background, (0, 0))
         self.screen.blit(self.s_grid, (self.grid_x, self.grid_y))
         pygame.display.flip()
 
+    def is_movable(self, sel_index, cell_check):
 
-def update_window(e, b, screen):
+        cell_ver = self.CELL_VER
 
-    w = e.w
-    h = e.h
-    b = pygame.Surface((w, h))
-    b = b.convert(screen)
-    pygame.draw.rect(b, color.GRAY, (0, 0, w, h))
-    return b
+        if not self.is_outer_border(sel_index):
+            if sel_index == (cell_check - 1) or sel_index == (cell_check + cell_ver):
+                return True
+            if sel_index == (cell_check + 1) or sel_index == (cell_check - cell_ver):
+                return True
+
+        return False
