@@ -16,21 +16,12 @@ class Window:
         self.OUTER_CELLS = 2
         self.cell_width = int(self.width / self.CELL_HOR)
         self.cell_height = int(self.height / self.CELL_VER)
-
-        # Create a window with the Surface screen
         self.screen_label = 'Code Ham Game'
-        pygame.display.set_caption(self.screen_label)
         self.screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE)
-
-        # Create a background Surface
         self.s_background = pygame.Surface((self.width, self.height))
-        pygame.draw.rect(self.s_background, color.GRAY, (0, 0, self.width, self.height))
-        self.s_background = self.s_background.convert(self.screen)
-        self.screen.blit(self.s_background, (0, 0))
-
-        # Create a grid Surface
+        self.clear_window()
+        pygame.display.set_caption(self.screen_label)
         self.s_grid = pygame.Surface((self.width, self.height))
-        self.s_grid = self.s_grid.convert(self.s_background)
         self.grid_x = 0
         self.grid_y = 0
 
@@ -38,7 +29,6 @@ class Window:
         self.grid = []
         self.sel_cells = [0]*4
         self.last_loc = [0, 0]
-
         # Constant of the cell border width
         self.GRID_CELL_WIDTH = 2
         self.draw_grid(True)
@@ -56,11 +46,13 @@ class Window:
                     self.grid_x = int(self.width - sub_width) / 2
                     self.grid_y = int(self.height - sub_height) / 2
                     self.screen.blit(self.s_grid, (self.grid_x, self.grid_y))
+                    self.clear_window()
                     self.draw_grid(False)
+                    pygame.display.update()
                     print('Screen Change')
                 elif event.type == pygame.QUIT:
                     sys.exit()
-            pygame.display.flip()
+            pygame.display.update()
 
     def init_sizes(self, event):
 
@@ -118,18 +110,11 @@ class Window:
         else:
             return False
 
+    def clear_window(self):
+
+        pygame.draw.rect(self.s_background, color.GRAY, (0, 0, self.width, self.height))
+
     def draw_layers(self):
 
         self.screen.blit(self.s_background, (self.width, self.height))
         self.screen.blit(self.s_grid, (self.grid_x, self.grid_y))
-        pygame.display.flip()
-
-
-def update_window(e, b, screen):
-
-    w = e.w
-    h = e.h
-    b = pygame.Surface((w, h))
-    b = b.convert(screen)
-    pygame.draw.rect(b, color.GRAY, (0, 0, w, h))
-    return b
