@@ -3,6 +3,7 @@ import sys
 import pygame
 from pygame.locals import *
 import color
+from player import Player
 
 
 class Window:
@@ -66,3 +67,14 @@ class Window:
                             pygame.draw.rect(self.display, color.HOT_PINK, new_rect, self.GRID_CELL_WIDTH + 2)
                             self.last_loc = [item[0][0], item[1][0]]
                             break
+
+#----------------------------------------------------------------------------------------------------
+ #Testing the characters
+        def create_char(self, rect):
+
+            player = Player()
+            renderPlayer = pygame.sprite.RenderPlain((player))
+            renderPlayer.draw(self.display)
+            pygame.display.flip()
+
+
