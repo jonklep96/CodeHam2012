@@ -5,10 +5,11 @@ def play_sound(name):
     try:
         effect = pygame.mixer.Sound('assets/' + name + '.ogg')
         effect.play(0)
+        pygame.mixer.Sound.set_volume(0.2)
     except:
         print("Cannot play this. Check the file name.")
 
 def play_music():
     pygame.mixer.music.load('assets/music.ogg')
     pygame.mixer.music.play(-1)
-    pygame.mixer.music.set_volume(0.2)
+    pygame.mixer.music.set_volume(0.5)
