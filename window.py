@@ -57,6 +57,9 @@ class Window:
         # Stores the index of the starting location and the previous location
         self.last_loc = CELL_VER * 2 + self.OUTER_CELLS
 
+        # Stores the amount of times the player has made an action
+        self.step = 0
+
         # Draw the layers to the screen
         self.draw_layers()
 
@@ -117,8 +120,8 @@ class Window:
                     self.byt.rect = pygame.Rect(sel_cell.x, sel_cell.y, self.byt.rect.width, self.byt.rect.height)
 
                     # Update the rect of the AI bots
-                    # for bot in self.bot_list:
-                    #    bot.rect =
+                    for bot in self.bot_list:
+                        self.move_bot(bot, bot.get_move_dir(self.byt.rect))
 
                     self.draw_grid(False)
 
@@ -147,6 +150,7 @@ class Window:
                         pygame.draw.rect(self.screen, color.BLUE, self.sel_cells[3], sel_width)
                     pygame.draw.rect(self.screen, color.YELLOW, sel_cell, sel_width + 1)
                     self.last_loc = grid_index
+                    self.step += 1
             grid_index += 1
 
     # Check to see if the position was inside the specified cell
@@ -195,6 +199,7 @@ class Window:
 
         return False
 
+    # Draw the group of sprites
     def draw_group(self, group):
         t_group = group.copy()
         for sprite in t_group.sprites():
@@ -205,17 +210,36 @@ class Window:
             t_group.add(sprite)
         t_group.draw(self.screen)
 
+    # Check for direction that the bot should move
+    def move_bot(self, bot, _dir):
 
+        if _dir == 0:
+            bot.move(self.grid[bot.loc - 1], bot.loc - 1)
+        elif _dir == 1:
+            bot.move(self.grid[bot.loc + CELL_VER], bot.loc + CELL_VER)
+        elif _dir == 2:
+            bot.move(self.grid[bot.loc + 1], bot.loc + 1)
+        elif _dir == 3:
+            bot.move(self.grid[bot.loc - CELL_VER], bot.loc - CELL_VER)
+
+
+# Spawn the bots on the sides of the screen
 def spawn_rand():
 
     ret = int(random.random() * 5)
 
     if ret == 0:
-        ret = 30  # debug transformers
+        while True:
+            ret = int(random.random() * (CELL_HOR * CELL_VER))
+            if ret % CELL_VER == 0:
+                break
     elif ret == 1:
         ret = (CELL_HOR * CELL_VER) - int(random.random() * CELL_VER)
     elif ret == 2:
-        ret = 44  # debug transformers
+        while True:
+            ret = int(random.random() * (CELL_HOR * CELL_VER))
+            if ret % (CELL_VER - 1) == 0:
+                break
     elif ret == 3:
         ret = int(random.random() * CELL_VER)
 
