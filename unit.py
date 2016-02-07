@@ -1,8 +1,4 @@
-#
-import os
 import pygame
-from pygame.locals import *
-import window
 
 class Unit(pygame.sprite.Sprite):
 

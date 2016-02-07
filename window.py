@@ -1,9 +1,8 @@
 import sys
 import pygame
 import color
-import unit
 import sound
-from unit import Unit
+import unit
 import main_menu
 
 #Initializes pygame and the mixer to prevent sound lag.
@@ -68,8 +67,8 @@ class Window:
         self.byt_list = pygame.sprite.Group()
 
         #Draw Characters - Initial
-        self.byt = Unit(self.grid[32], 'byt', 'Byt')
-        bot = Unit(self.grid[20], 'bot', 'Bot')
+        self.byt = unit.Unit(self.grid[32], 'byt', 'Byt')
+        bot = unit.Unit(self.grid[20], 'bot', 'Bot')
         self.byt_list.add(self.byt)
         self.bot_list.add(bot)
         self.draw_group(self.bot_list)
