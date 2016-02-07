@@ -12,7 +12,3 @@ def play_music():
     pygame.mixer.music.load('assets/music.ogg')
     pygame.mixer.music.play(-1)
     pygame.mixer.music.set_volume(0.2)
-
-
-
-

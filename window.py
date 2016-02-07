@@ -1,10 +1,10 @@
-#
 import sys
 import pygame
 import color
 import unit
 import sound
 from unit import Unit
+import main_menu
 
 #Initializes pygame and the mixer to prevent sound lag.
 pygame.mixer.pre_init(44100, -16, 2, 2048)
@@ -26,6 +26,9 @@ class Window:
         self.screen_label = 'BytBot'
         pygame.display.set_caption(self.screen_label)
         self.screen = pygame.display.set_mode((self.width, self.height))
+
+        # Create a main menu
+        main_menu.start_menu(self.screen)
 
         # Create a background Surface
         self.s_background = pygame.Surface((self.width, self.height))
