@@ -1,8 +1,13 @@
+#
 import sys
 import pygame
 import color
-import main_menu
+import unit
+import sound
+from unit import Unit
 
+#Initializes pygame and the mixer to prevent sound lag.
+pygame.mixer.pre_init(44100, -16, 2, 2048)
 pygame.init()
 
 
@@ -18,12 +23,9 @@ class Window:
         self.cell_height = int(self.height / self.CELL_VER)
 
         # Create a window with the Surface screen
-        self.screen_label = 'Code Ham Game'
+        self.screen_label = 'BytBot'
         pygame.display.set_caption(self.screen_label)
         self.screen = pygame.display.set_mode((self.width, self.height))
-
-        # Create a main menu
-        main_menu.start_menu(self.screen)
 
         # Create a background Surface
         self.s_background = pygame.Surface((self.width, self.height))
@@ -53,13 +55,30 @@ class Window:
         # Draw the layers to the screen
         self.draw_layers()
 
+        #Start Music
+        sound.play_music()
+
+        #Creating the groups for sprites. Items, BytBot - contains all characters, Bot - enemies
+        self.item_list = pygame.sprite.Group()
+        self.bytbot_list = pygame.sprite.Group()
+        self.bot_list = pygame.sprite.Group()
+        self.byt_list = pygame.sprite.Group()
+
+        #Draw Characters - Initial
+        self.byt = Unit(self.grid[32], 'byt', 'Byt')
+        bot = Unit(self.grid[20], 'bot', 'Bot')
+        self.byt_list.add(self.byt)
+        self.bot_list.add(bot)
+        self.draw_group(self.bot_list)
+        self.draw_group(self.byt_list)
+
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     pos = pygame.mouse.get_pos()
                     print(pos)  # debug mouse position
                     self.check_click(pos)
-                if event.type == pygame.QUIT:
+                elif event.type == pygame.QUIT:
                     sys.exit()
             pygame.display.flip()
 
@@ -89,6 +108,7 @@ class Window:
                 if self.is_movable(grid_index, self.last_loc):
                     print(grid_index)  # debug cell index
                     sel_cell = pygame.Rect(item.x, item.y, self.cell_width, self.cell_height)
+                    self.byt.rect = pygame.Rect(sel_cell.x, sel_cell.y, self.byt.rect.width, self.byt.rect.height)
                     self.draw_grid(False)
 
                     # Selectable grid choices
@@ -113,6 +133,7 @@ class Window:
                     if self.is_movable(grid_index - self.CELL_VER, grid_index):
                         pygame.draw.rect(self.screen, color.BLUE, self.sel_cells[3], sel_width)
                     pygame.draw.rect(self.screen, color.YELLOW, sel_cell, sel_width + 1)
+                    self.draw_group(self.byt_list)
                     self.last_loc = grid_index
             grid_index += 1
 
@@ -148,6 +169,7 @@ class Window:
         self.screen.blit(self.s_background, (0, 0))
         self.screen.blit(self.s_grid, (self.grid_x, self.grid_y))
         pygame.display.flip()
+        sound.play_sound('bytmove')
 
     def is_movable(self, sel_index, cell_check):
 
@@ -160,3 +182,13 @@ class Window:
                 return True
 
         return False
+
+    def draw_group(self, group):
+        t_group = group.copy()
+        for sprite in t_group.sprites():
+            t_x = sprite.rect.x + int((self.cell_width - sprite.rect.width) / 2)
+            t_y = sprite.rect.y + int((self.cell_height - sprite.rect.height) / 2)
+            t_rect = pygame.Rect(t_x, t_y, sprite.rect.width, sprite.rect.height)
+            sprite.rect = t_rect
+            t_group.add(sprite)
+        t_group.draw(self.screen)
