@@ -3,11 +3,12 @@ import color
 
 def start_menu(screen):
 
+    menuimg = pygame.image.load('assets/titlescreen.png')
     s_background = pygame.Surface((screen.get_width(), screen.get_height()))
     x = 0
     y = 0
     pygame.draw.rect(s_background, color.BLUE, (x, y, screen.get_width(), screen.get_height()))
-    s_background = s_background.convert(screen)
+    s_background = menuimg.convert(screen)
     screen.blit(s_background, (x, y))
     pygame.display.flip()
 
