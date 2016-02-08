@@ -1,6 +1,7 @@
 import pygame
 import color
 
+
 def start_menu(screen):
 
     menuimg = pygame.image.load('assets/titlescreen.png')

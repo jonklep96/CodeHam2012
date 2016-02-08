@@ -122,6 +122,7 @@ class Window:
                     # Update the rect of the AI bots
                     for bot in self.bot_list:
                         self.move_bot(bot, bot.get_move_dir(self.byt.rect))
+                        print(bot.loc)  # debug where the bot is
 
                     self.draw_grid(False)
 
@@ -226,7 +227,7 @@ class Window:
 # Spawn the bots on the sides of the screen
 def spawn_rand():
 
-    ret = int(random.random() * 5)
+    ret = int(random.random() * 4)
 
     if ret == 0:
         while True:
