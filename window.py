@@ -226,7 +226,7 @@ class Window:
 # Spawn the bots on the sides of the screen
 def spawn_rand():
 
-    ret = int(random.random() * 5)
+    ret = int(random.random() * 4)
 
     if ret == 0:
         while True:
