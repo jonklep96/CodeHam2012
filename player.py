@@ -1,12 +1,9 @@
-from unit import Unit
+import unit
 import pygame
 import os
 
-class Player(Unit):
+class Player(unit.Unit):
 
-    def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
-        self.image, self.rect = self.load_image('assets/byt.png', -1)
-        screen = pygame.display.get_surface()
-        self.area = screen.get_rect()
-        self.rect.topleft = 10, 10
+    def __init__(self, _rect, _name, _img):
+
+        unit.Unit.__init__(self, _rect, _name, _img)

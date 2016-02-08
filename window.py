@@ -2,10 +2,11 @@ import sys
 import pygame
 import color
 import sound
-import unit
 import main_menu
 import enemy
 import random
+import cell
+import player
 
 # Initializes pygame and the mixer to prevent sound lag.
 pygame.mixer.pre_init(44100, -16, 2, 2048)
@@ -13,10 +14,10 @@ pygame.init()
 
 CELL_HOR = 15
 CELL_VER = 15
+OUTER_CELLS = 2
 
 
 class Window:
-
     def __init__(self):
 
         self.width = 600
@@ -47,15 +48,13 @@ class Window:
 
         # List to store cell coordinates
         self.grid = []
-        self.sel_cells = [0]*4
 
         # Constant of the cell border width
-        self.OUTER_CELLS = 2
         self.GRID_CELL_WIDTH = 2
         self.draw_grid(True)
 
         # Stores the index of the starting location and the previous location
-        self.last_loc = CELL_VER * 2 + self.OUTER_CELLS
+        self.last_loc = CELL_VER * 2 + OUTER_CELLS
 
         # Stores the amount of times the player has made an action
         self.step = 0
@@ -73,9 +72,9 @@ class Window:
         self.byt_list = pygame.sprite.Group()
 
         # Draw Characters - Initial
-        self.byt = unit.Unit(self.grid[32], 'byt', 'Byt')
+        self.byt = player.Player(self.grid[32], 'byt', 'Byt')
         self.byt_list.add(self.byt)
-        for i in range(1, 4):
+        for i in range(1, 5):
             bot = enemy.Enemy(self.grid[spawn_rand()], 'bot', 'Bot')
             self.bot_list.add(bot)
         self.draw_group(self.bot_list)
@@ -99,10 +98,11 @@ class Window:
         grid_index = 0
         for x in range(0, self.width, self.cell_width):
             for y in range(0, self.height, self.cell_height):
-                rect = pygame.Rect(x, y, self.cell_width, self.cell_height)
+                rect = cell.Cell(x, y, self.cell_width, self.cell_height, grid_index)
                 if first_run:
                     self.grid.append(rect)
-                if self.is_outer_border(grid_index):
+                    self.init_outer_border(grid_index)
+                if self.grid[grid_index].on_border:
                     pygame.draw.rect(self.s_grid, color.OFF_WHITE, rect, self.GRID_CELL_WIDTH)
                 else:
                     pygame.draw.rect(self.s_grid, color.WHITE, rect, self.GRID_CELL_WIDTH)
@@ -114,10 +114,11 @@ class Window:
         grid_index = 0
         for item in self.grid:
             if self.rect_contain(item, pos):
-                if self.is_movable(grid_index, self.last_loc):
+                if self.grid[grid_index].is_access:
                     print(grid_index)  # debug cell index
-                    sel_cell = pygame.Rect(item.x, item.y, self.cell_width, self.cell_height)
-                    self.byt.rect = pygame.Rect(sel_cell.x, sel_cell.y, self.byt.rect.width, self.byt.rect.height)
+                    sel_cell = self.grid[grid_index]
+                    adj_cells = self.grid[grid_index].get_adjacent()
+                    self.byt.set_rect(sel_cell)
 
                     # Update the rect of the AI bots
                     for bot in self.bot_list:
@@ -125,12 +126,6 @@ class Window:
                         print(bot.loc)  # debug where the bot is
 
                     self.draw_grid(False)
-
-                    # Selectable grid choices
-                    self.sel_cells[0] = self.grid[grid_index - 1]
-                    self.sel_cells[1] = self.grid[grid_index + CELL_VER]
-                    self.sel_cells[2] = self.grid[grid_index + 1]
-                    self.sel_cells[3] = self.grid[grid_index - CELL_VER]
 
                     # Remove the previous selected cells
                     self.draw_layers()
@@ -141,15 +136,15 @@ class Window:
                     sel_width = self.GRID_CELL_WIDTH + 2
 
                     # Draw the selectable locations
-                    if self.is_movable(grid_index - 1, grid_index):
-                        pygame.draw.rect(self.screen, color.BLUE, self.sel_cells[0], sel_width)
-                    if self.is_movable(grid_index + CELL_VER, grid_index):
-                        pygame.draw.rect(self.screen, color.BLUE, self.sel_cells[1], sel_width)
-                    if self.is_movable(grid_index + 1, grid_index):
-                        pygame.draw.rect(self.screen, color.BLUE, self.sel_cells[2], sel_width)
-                    if self.is_movable(grid_index - CELL_VER, grid_index):
-                        pygame.draw.rect(self.screen, color.BLUE, self.sel_cells[3], sel_width)
-                    pygame.draw.rect(self.screen, color.YELLOW, sel_cell, sel_width + 1)
+                    if adj_cells[0] != -1 and not self.grid[adj_cells[0]].on_border:
+                        pygame.draw.rect(self.screen, color.BLUE, self.grid[adj_cells[0]].get_rect(), sel_width)
+                    if adj_cells[1] != -1 and not self.grid[adj_cells[1]].on_border:
+                        pygame.draw.rect(self.screen, color.BLUE, self.grid[adj_cells[1]].get_rect(), sel_width)
+                    if adj_cells[2] != -1 and not self.grid[adj_cells[2]].on_border:
+                        pygame.draw.rect(self.screen, color.BLUE, self.grid[adj_cells[2]].get_rect(), sel_width)
+                    if adj_cells[3] != -1 and not self.grid[adj_cells[3]].on_border:
+                        pygame.draw.rect(self.screen, color.BLUE, self.grid[adj_cells[3]].get_rect(), sel_width)
+                    pygame.draw.rect(self.screen, color.YELLOW, sel_cell.get_rect(), sel_width + 1)
                     self.last_loc = grid_index
                     self.step += 1
             grid_index += 1
@@ -168,37 +163,19 @@ class Window:
         else:
             return False
 
-    def is_outer_border(self, index):
+    def init_outer_border(self, index):
 
-        outer_cells = self.OUTER_CELLS
-        cell_hor = CELL_HOR
-        cell_ver = CELL_VER
-
-        if index >= (outer_cells * cell_ver):
-            if index < ((cell_hor * cell_ver) - (outer_cells * cell_ver)):
-                if outer_cells <= (index % cell_ver) < (cell_ver - outer_cells):
-                    return False
-
-        return True
+        if index >= (OUTER_CELLS * CELL_VER):
+            if index < ((CELL_HOR * CELL_VER) - (OUTER_CELLS * CELL_VER)):
+                if OUTER_CELLS <= (index % CELL_VER) < (CELL_VER - OUTER_CELLS):
+                    self.grid[index].on_border = False
 
     def draw_layers(self):
 
         self.screen.blit(self.s_background, (0, 0))
         self.screen.blit(self.s_grid, (self.grid_x, self.grid_y))
-        pygame.display.flip()
         sound.play_sound('bytmove')
-
-    def is_movable(self, sel_index, cell_check):
-
-        cell_ver = CELL_VER
-
-        if not self.is_outer_border(sel_index):
-            if sel_index == (cell_check - 1) or sel_index == (cell_check + cell_ver):
-                return True
-            if sel_index == (cell_check + 1) or sel_index == (cell_check - cell_ver):
-                return True
-
-        return False
+        pygame.display.flip()
 
     # Draw the group of sprites
     def draw_group(self, group):
@@ -226,7 +203,6 @@ class Window:
 
 # Spawn the bots on the sides of the screen
 def spawn_rand():
-
     ret = int(random.random() * 4)
 
     if ret == 0:
@@ -235,11 +211,11 @@ def spawn_rand():
             if ret % CELL_VER == 0:
                 break
     elif ret == 1:
-        ret = (CELL_HOR * CELL_VER) - int(random.random() * CELL_VER)
+        ret = ((CELL_HOR * CELL_VER) - 1) - int(random.random() * CELL_VER)
     elif ret == 2:
         while True:
             ret = int(random.random() * (CELL_HOR * CELL_VER))
-            if ret % (CELL_VER - 1) == 0:
+            if ret % CELL_VER == CELL_VER - 1:
                 break
     elif ret == 3:
         ret = int(random.random() * CELL_VER)

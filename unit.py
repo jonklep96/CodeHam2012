@@ -26,3 +26,8 @@ class Unit(pygame.sprite.Sprite):
         self.atk = 1
         self.speed = 1
         self.loc = -1
+
+    def set_rect(self, cell):
+
+        self.rect.x = cell.x
+        self.rect.y = cell.y
