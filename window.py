@@ -122,6 +122,7 @@ class Window:
                     # Update the rect of the AI bots
                     for bot in self.bot_list:
                         self.move_bot(bot, bot.get_move_dir(self.byt.rect))
+                        print(bot.loc)  # debug where the bot is
 
                     self.draw_grid(False)
 

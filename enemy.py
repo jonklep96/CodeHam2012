@@ -1,5 +1,6 @@
 import unit
 import random
+import pygame
 import window
 
 
@@ -23,11 +24,9 @@ class Enemy(unit.Unit):
             return 3
         elif self.rect.y < byt_rect.y:
             return 2
-        else:
-            return 0
 
     # Is called when the bot is moved
     def move(self, _rect, _loc):
 
-        self.rect = _rect
+        self.rect = pygame.Rect(_rect.x, _rect.y, self.rect.width, self.rect.height)
         self.loc = _loc

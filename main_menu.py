@@ -1,6 +1,7 @@
 import pygame
 import color
 
+
 def start_menu(screen):
 
     s_background = pygame.Surface((screen.get_width(), screen.get_height()))
