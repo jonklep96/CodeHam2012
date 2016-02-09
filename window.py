@@ -7,6 +7,7 @@ import enemy
 import random
 import cell
 import player
+import item
 
 # Initializes pygame and the mixer to prevent sound lag.
 pygame.mixer.pre_init(44100, -16, 2, 2048)
@@ -63,7 +64,7 @@ class Window:
         self.draw_layers()
 
         # Start Music
-        sound.play_music()
+        # sound.play_music()
 
         # Creating the groups for sprites. Items, BytBot - contains all characters, Bot - enemies
         self.item_list = pygame.sprite.Group()
@@ -79,6 +80,12 @@ class Window:
             self.bot_list.add(bot)
         self.draw_group(self.bot_list)
         self.draw_group(self.byt_list)
+
+        # Draw items - initial
+        self.spark = item.Item(self.grid[55], 'spark', 'Spark')
+        self.heart = item.Item(self.grid[70], 'heart', 'Heart')
+        self.item_list.add(self.spark, self.heart)
+        self.draw_group(self.item_list)
 
         while True:
             for event in pygame.event.get():
@@ -112,8 +119,8 @@ class Window:
     def check_click(self, pos):
 
         grid_index = 0
-        for item in self.grid:
-            if self.rect_contain(item, pos):
+        for _item in self.grid:
+            if self.rect_contain(_item, pos):
                 if self.grid[grid_index].is_access:
                     print(grid_index)  # debug cell index
                     sel_cell = self.grid[grid_index]

@@ -65,7 +65,7 @@ class Cell(pygame.Rect):
             ret[0] = -1
         else:
             ret[0] = self.loc - 1
-        if ((window.CELL_HOR * window.CELL_VER) - window.CELL_VER) < self.loc < (window.CELL_HOR * window.CELL_VER):
+        if ((window.CELL_HOR * window.CELL_VER) - window.CELL_VER - 1) < self.loc < (window.CELL_HOR * window.CELL_VER):
             ret[1] = -1
         else:
             ret[1] = self.loc + window.CELL_VER
