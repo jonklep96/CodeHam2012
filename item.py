@@ -1,5 +1,6 @@
 import pygame
 
+
 class Item(pygame.sprite.Sprite):
 
      def __init__(self, _rect, img, _name):

@@ -1,8 +1,11 @@
 import pygame
 import enemy
 import player
-import window
+import window_locals
 
+
+CELL_HOR = window_locals.CELL_HOR
+CELL_VER = window_locals.CELL_VER
 
 class Cell(pygame.Rect):
 
@@ -47,12 +50,12 @@ class Cell(pygame.Rect):
     def is_moveable(self, index, unit):
 
         if isinstance(unit, enemy.Enemy):
-            if index == unit.loc - 1 or index == unit.loc + window.CELL_VER:
-                if index == unit.loc + 1 or index == unit.loc - window.CELL_VER:
+            if index == unit.loc - 1 or index == unit.loc + CELL_VER:
+                if index == unit.loc + 1 or index == unit.loc - CELL_VER:
                     return True
         elif isinstance(unit, player.Player):
-            if index == unit.loc - 1 or index == unit.loc + window.CELL_VER:
-                if index == unit.loc + 1 or index == unit.loc - window.CELL_VER:
+            if index == unit.loc - 1 or index == unit.loc + CELL_VER:
+                if index == unit.loc + 1 or index == unit.loc - CELL_VER:
                     return True
 
         return False
@@ -61,22 +64,22 @@ class Cell(pygame.Rect):
 
         ret = [0, 0, 0, 0]
 
-        if self.loc % window.CELL_VER == 0:
+        if self.loc % CELL_VER == 0:
             ret[0] = -1
         else:
             ret[0] = self.loc - 1
-        if ((window.CELL_HOR * window.CELL_VER) - window.CELL_VER - 1) < self.loc < (window.CELL_HOR * window.CELL_VER):
+        if ((CELL_HOR * CELL_VER) - CELL_VER - 1) < self.loc < (CELL_HOR * CELL_VER):
             ret[1] = -1
         else:
-            ret[1] = self.loc + window.CELL_VER
-        if self.loc % window.CELL_VER == window.CELL_VER - 1:
+            ret[1] = self.loc + CELL_VER
+        if self.loc % CELL_VER == CELL_VER - 1:
             ret[2] = -1
         else:
             ret[2] = self.loc + 1
-        if 0 <= self.loc < window.CELL_VER:
+        if 0 <= self.loc < CELL_VER:
             ret[3] = -1
         else:
-            ret[3] = self.loc - window.CELL_VER
+            ret[3] = self.loc - CELL_VER
 
         return ret
 

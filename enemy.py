@@ -1,7 +1,7 @@
 import unit
 import random
 import pygame
-import window
+import window_locals
 
 
 class Enemy(unit.Unit):
@@ -17,8 +17,8 @@ class Enemy(unit.Unit):
     # Make the AI choose the right direction
     def get_move_dir(self, byt):
 
-        byt_y = (byt.loc - (byt.loc % window.CELL_HOR)) / window.CELL_HOR
-        bot_y = (self.loc - (self.loc % window.CELL_VER)) / window.CELL_VER
+        byt_y = (byt.loc - (byt.loc % window_locals.CELL_HOR)) / window_locals.CELL_HOR
+        bot_y = (self.loc - (self.loc % window_locals.CELL_VER)) / window_locals.CELL_VER
 
         if bot_y > byt_y:
             print('Bot is Better')
