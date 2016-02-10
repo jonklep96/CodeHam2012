@@ -4,7 +4,7 @@ import pygame
 class Unit(pygame.sprite.Sprite):
 
     # Constructor
-    def __init__(self, _rect, img, _name):
+    def __init__(self, _rect, _img, _name, _loc):
         self.name = _name
 
         # Calling the parent constructor, pygame.sprite.Sprite
@@ -18,14 +18,14 @@ class Unit(pygame.sprite.Sprite):
         self.rect = pygame.Rect(x, y, width, height)
 
         # Loading the sprite
-        self.image = pygame.image.load('assets/' + img + '.png')
+        self.image = pygame.image.load('assets/' + _img + '.png')
 
         # Instance Variables for Byts and Bots:
         self.health = 10
         self.money = 0
         self.atk = 1
         self.speed = 1
-        self.loc = -1
+        self.loc = _loc
 
     def set_rect(self, cell):
 

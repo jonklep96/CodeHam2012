@@ -73,10 +73,11 @@ class Window:
         self.byt_list = pygame.sprite.Group()
 
         # Draw Characters - Initial
-        self.byt = player.Player(self.grid[32], 'byt', 'Byt')
+        self.byt = player.Player(self.grid[32], 'byt', 'Byt', 32)
         self.byt_list.add(self.byt)
         for i in range(1, 5):
-            bot = enemy.Enemy(self.grid[spawn_rand()], 'bot', 'Bot')
+            rand_loc = spawn_rand()
+            bot = enemy.Enemy(self.grid[rand_loc], 'bot', 'Bot', rand_loc)
             self.bot_list.add(bot)
         self.draw_group(self.bot_list)
         self.draw_group(self.byt_list)
@@ -121,39 +122,43 @@ class Window:
         grid_index = 0
         for _item in self.grid:
             if self.rect_contain(_item, pos):
-                if self.grid[grid_index].is_access:
-                    print(grid_index)  # debug cell index
-                    sel_cell = self.grid[grid_index]
-                    adj_cells = self.grid[grid_index].get_adjacent()
-                    self.byt.set_rect(sel_cell)
+                cell = self.grid[grid_index]
+                if cell.is_access and not cell.on_border:
+                    for i in cell.get_adjacent():
+                        for j in self.grid[self.last_loc].get_adjacent():
+                            if i == j:
+                                print(grid_index)  # debug cell index
+                                sel_cell = self.grid[grid_index]
+                                adj_cells = cell.get_adjacent()
+                                self.byt.set_rect(sel_cell)
 
-                    # Update the rect of the AI bots
-                    for bot in self.bot_list:
-                        self.move_bot(bot, bot.get_move_dir(self.byt.rect))
-                        print(bot.loc)  # debug where the bot is
+                                # Update the rect of the AI bots
+                                for bot in self.bot_list:
+                                    self.move_bot(bot, bot.get_move_dir(self.byt))
+                                    print(bot.loc)  # debug where the bot is
 
-                    self.draw_grid(False)
+                                self.draw_grid(False)
 
-                    # Remove the previous selected cells
-                    self.draw_layers()
-                    self.draw_group(self.byt_list)
-                    self.draw_group(self.bot_list)
+                                # Remove the previous selected cells
+                                self.draw_layers()
+                                self.draw_group(self.byt_list)
+                                self.draw_group(self.bot_list)
 
-                    # Width of cell selection
-                    sel_width = self.GRID_CELL_WIDTH + 2
+                                # Width of cell selection
+                                sel_width = self.GRID_CELL_WIDTH + 2
 
-                    # Draw the selectable locations
-                    if adj_cells[0] != -1 and not self.grid[adj_cells[0]].on_border:
-                        pygame.draw.rect(self.screen, color.BLUE, self.grid[adj_cells[0]].get_rect(), sel_width)
-                    if adj_cells[1] != -1 and not self.grid[adj_cells[1]].on_border:
-                        pygame.draw.rect(self.screen, color.BLUE, self.grid[adj_cells[1]].get_rect(), sel_width)
-                    if adj_cells[2] != -1 and not self.grid[adj_cells[2]].on_border:
-                        pygame.draw.rect(self.screen, color.BLUE, self.grid[adj_cells[2]].get_rect(), sel_width)
-                    if adj_cells[3] != -1 and not self.grid[adj_cells[3]].on_border:
-                        pygame.draw.rect(self.screen, color.BLUE, self.grid[adj_cells[3]].get_rect(), sel_width)
-                    pygame.draw.rect(self.screen, color.YELLOW, sel_cell.get_rect(), sel_width + 1)
-                    self.last_loc = grid_index
-                    self.step += 1
+                                # Draw the selectable locations
+                                if adj_cells[0] != -1 and not self.grid[adj_cells[0]].on_border:
+                                    pygame.draw.rect(self.screen, color.BLUE, self.grid[adj_cells[0]].get_rect(), sel_width)
+                                if adj_cells[1] != -1 and not self.grid[adj_cells[1]].on_border:
+                                    pygame.draw.rect(self.screen, color.BLUE, self.grid[adj_cells[1]].get_rect(), sel_width)
+                                if adj_cells[2] != -1 and not self.grid[adj_cells[2]].on_border:
+                                    pygame.draw.rect(self.screen, color.BLUE, self.grid[adj_cells[2]].get_rect(), sel_width)
+                                if adj_cells[3] != -1 and not self.grid[adj_cells[3]].on_border:
+                                    pygame.draw.rect(self.screen, color.BLUE, self.grid[adj_cells[3]].get_rect(), sel_width)
+                                pygame.draw.rect(self.screen, color.YELLOW, sel_cell.get_rect(), sel_width + 1)
+                                self.last_loc = grid_index
+                                self.step += 1
             grid_index += 1
 
     # Check to see if the position was inside the specified cell
