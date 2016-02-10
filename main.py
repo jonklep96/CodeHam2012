@@ -10,6 +10,7 @@ import player
 import item
 import window_locals
 
+
 # draws the grid according to the screen size
 # during the first_run, draw_grid will add the
 # rects to a list
@@ -30,65 +31,61 @@ def draw_grid(first_run):
 
 
 # checks for which grid you clicked in
-def check_click(_pos, _step):
+def check_click(_pos, _step, _last_loc):
 
     grid_index = 0
-    for _item in grid:
-        if rect_contain(_item, _pos):
-            _cell = grid[grid_index]
+    for _cell in grid:
+        if rect_contain(_cell, _pos):
             if _cell.is_access and not _cell.on_border:
-                for i in _cell.get_adjacent():
-                    for j in grid[last_loc].get_adjacent():
-                        if i == j:
-                            print(grid_index)  # debug cell index
-                            sel_cell = grid[grid_index]
-                            adj_cells = cell.get_adjacent()
-                            byt.set_rect(sel_cell)
+                for _j in grid[_last_loc].get_adjacent():
+                    if grid_index == _j:
+                        print(grid_index)  # debug cell index
+                        sel_cell = grid[grid_index]
+                        adj_cells = _cell.get_adjacent()
+                        byt.set_rect(sel_cell)
 
-                            # Update the rect of the AI bots
-                            for bot in bot_list:
-                                move_bot(bot, bot.get_move_dir(byt))
-                                print(bot.loc)  # debug where the bot is
+                        # Update the rect of the AI bots
+                        for _bot in bot_list:
+                            move_bot(_bot, _bot.get_move_dir(byt))
+                            print(_bot.loc)  # debug where the bot is
 
-                            draw_grid(False)
+                        # Remove the previous selected cells
+                        draw_layers()
+                        draw_group(byt_list)
+                        draw_group(bot_list)
 
-                            # Remove the previous selected cells
-                            draw_layers()
-                            draw_group(byt_list)
-                            draw_group(bot_list)
+                        # Width of cell selection
+                        sel_width = GRID_CELL_WIDTH + 2
 
-                            # Width of cell selection
-                            sel_width = GRID_CELL_WIDTH + 2
-
-                            # Draw the selectable locations
-                            if adj_cells[0] != -1 and not grid[adj_cells[0]].on_border:
-                                pygame.draw.rect(screen, color.BLUE, grid[adj_cells[0]].get_rect(), sel_width)
-                            if adj_cells[1] != -1 and not grid[adj_cells[1]].on_border:
-                                pygame.draw.rect(screen, color.BLUE, grid[adj_cells[1]].get_rect(), sel_width)
-                            if adj_cells[2] != -1 and not grid[adj_cells[2]].on_border:
-                                pygame.draw.rect(screen, color.BLUE, grid[adj_cells[2]].get_rect(), sel_width)
-                            if adj_cells[3] != -1 and not grid[adj_cells[3]].on_border:
-                                pygame.draw.rect(screen, color.BLUE, grid[adj_cells[3]].get_rect(), sel_width)
-                            pygame.draw.rect(screen, color.YELLOW, sel_cell.get_rect(), sel_width + 1)
-                            last_loc = grid_index
-                            _step += 1
+                        # Draw the selectable locations
+                        if adj_cells[0] != -1 and not grid[adj_cells[0]].on_border:
+                            pygame.draw.rect(screen, color.BLUE, grid[adj_cells[0]].get_rect(), sel_width)
+                        if adj_cells[1] != -1 and not grid[adj_cells[1]].on_border:
+                            pygame.draw.rect(screen, color.BLUE, grid[adj_cells[1]].get_rect(), sel_width)
+                        if adj_cells[2] != -1 and not grid[adj_cells[2]].on_border:
+                            pygame.draw.rect(screen, color.BLUE, grid[adj_cells[2]].get_rect(), sel_width)
+                        if adj_cells[3] != -1 and not grid[adj_cells[3]].on_border:
+                            pygame.draw.rect(screen, color.BLUE, grid[adj_cells[3]].get_rect(), sel_width)
+                        pygame.draw.rect(screen, color.YELLOW, sel_cell.get_rect(), sel_width + 1)
+                        _last_loc = grid_index
+                        _step += 1
         grid_index += 1
-    return _step
+    return [_step, _last_loc]
 
 
 # Check to see if the position was inside the specified cell
-def rect_contain(rect, pos):
+def rect_contain(_rect, _pos):
 
     # Values to store clicking and drawing
     padding_adjustment = GRID_CELL_WIDTH + 1
 
-    if pos[0] > rect.x + padding_adjustment:
-        if pos[0] < rect.x + rect.width - padding_adjustment:
-            if pos[1] > rect.y + padding_adjustment:
-                if pos[1] < rect.y + rect.height - padding_adjustment:
+    if _pos[0] > _rect.x + padding_adjustment:
+        if _pos[0] < _rect.x + _rect.width - padding_adjustment:
+            if _pos[1] > _rect.y + padding_adjustment:
+                if _pos[1] < _rect.y + _rect.height - padding_adjustment:
                     return True
-    else:
-        return False
+
+    return False
 
 
 def init_outer_border(index):
@@ -152,6 +149,21 @@ def spawn_rand():
         ret = int(random.random() * CELL_VER)
 
     return ret
+
+
+# Draws the currently selected cell
+def draw_selector(_pos):
+
+    _index = 0
+    for _cell in grid:
+        if rect_contain(_cell, _pos):
+            draw_layers()
+            _sel_width = GRID_CELL_WIDTH + 1
+            pygame.draw.rect(screen, color.HOT_PINK, _cell.get_rect(), _sel_width)
+            pygame.display.flip()
+            break
+        _index += 1
+
 
 # Initializes pygame and the mixer to prevent sound lag.
 pygame.mixer.pre_init(44100, -16, 2, 2048)
@@ -232,10 +244,14 @@ draw_group(item_list)
 
 while True:
     for event in pygame.event.get():
-        if event.type == pygame.MOUSEBUTTONDOWN:
+        m_sel = pygame.mouse.get_pos()
+        draw_selector(m_sel)
+        if event.type == pygame.MOUSEBUTTONUP:
             pos = pygame.mouse.get_pos()
             print(pos)  # debug mouse position
-            step = check_click(pos, step)
+            t_list = check_click(pos, step, last_loc)
+            step = t_list[0]
+            last_loc = t_list[1]
         elif event.type == pygame.QUIT:
             sys.exit()
         pygame.display.flip()
