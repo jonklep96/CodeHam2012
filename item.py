@@ -3,7 +3,7 @@ import pygame
 
 class Item(pygame.sprite.Sprite):
 
-     def __init__(self, _rect, img, _name):
+     def __init__(self, _rect, _img, _name):
         self.name = _name
 
         # Calling the parent constructor, pygame.sprite.Sprite
@@ -17,4 +17,4 @@ class Item(pygame.sprite.Sprite):
         self.rect = pygame.Rect(x, y, width, height)
 
         # Loading the item sprite
-        self.image = pygame.image.load('assets/' + img + '.png')
+        self.image = pygame.image.load('assets/' + _img + '.png')

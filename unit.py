@@ -16,6 +16,7 @@ class Unit(pygame.sprite.Sprite):
         width = 32
         height = 32
         self.rect = pygame.Rect(x, y, width, height)
+        self.set_rect(_rect)
 
         # Loading the sprite
         self.image = pygame.image.load('assets/' + _img + '.png')
@@ -27,7 +28,13 @@ class Unit(pygame.sprite.Sprite):
         self.speed = 1
         self.loc = _loc
 
-    def set_rect(self, cell):
+    def set_rect(self, _cell):
 
-        self.rect.x = cell.x
-        self.rect.y = cell.y
+        self.rect.x = _cell.x + int((_cell.width - self.rect.width) / 2)
+        self.rect.y = _cell.y + int((_cell.height - self.rect.height) / 2)
+
+    # Is called when the unit is moved
+    def move(self, _cell):
+
+        self.set_rect(_cell)
+        self.loc = _cell.loc

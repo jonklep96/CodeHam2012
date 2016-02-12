@@ -47,15 +47,15 @@ class Cell(pygame.Rect):
         else:
             return False
 
-    def is_moveable(self, index, unit):
+    def is_moveable(self, _index, _unit):
 
-        if isinstance(unit, enemy.Enemy):
-            if index == unit.loc - 1 or index == unit.loc + CELL_VER:
-                if index == unit.loc + 1 or index == unit.loc - CELL_VER:
+        if isinstance(_unit, enemy.Enemy):
+            if _index == _unit.loc - 1 or _index == _unit.loc + CELL_VER:
+                if _index == _unit.loc + 1 or _index == _unit.loc - CELL_VER:
                     return True
-        elif isinstance(unit, player.Player):
-            if index == unit.loc - 1 or index == unit.loc + CELL_VER:
-                if index == unit.loc + 1 or index == unit.loc - CELL_VER:
+        elif isinstance(_unit, player.Player):
+            if _index == _unit.loc - 1 or _index == _unit.loc + CELL_VER:
+                if _index == _unit.loc + 1 or _index == _unit.loc - CELL_VER:
                     return True
 
         return False
