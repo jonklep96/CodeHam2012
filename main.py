@@ -17,8 +17,10 @@ import window_locals
 def draw_grid(first_run):
 
     grid_index = 0
-    for x in range(0, WIDTH, cell_width):
-        for y in range(0, HEIGHT, cell_height):
+    for i in range(0, CELL_HOR, 1):
+        for j in range(0, CELL_VER, 1):
+            x = i * cell_width
+            y = j * cell_height
             rect = cell.Cell(x, y, cell_width, cell_height, grid_index)
             if first_run:
                 grid.append(rect)
@@ -63,7 +65,7 @@ def check_click(_pos, _step, _last_loc):
 def rect_contain(_rect, _pos):
 
     # Values to store clicking and drawing
-    padding_adjustment = CELL_LINE_WIDTH + 1
+    padding_adjustment = CELL_LINE_WIDTH
 
     if _pos[0] > _rect.x + padding_adjustment:
         if _pos[0] < _rect.x + _rect.width - padding_adjustment:
@@ -204,8 +206,8 @@ OUTER_CELLS = window_locals.OUTER_CELLS
 WIDTH = window_locals.WIDTH
 HEIGHT = window_locals.HEIGHT
 
-cell_width = int(WIDTH / CELL_HOR)
-cell_height = int(HEIGHT / CELL_VER)
+cell_width = (WIDTH - (WIDTH % CELL_HOR)) // CELL_HOR
+cell_height = (HEIGHT - (HEIGHT % CELL_VER)) // CELL_VER
 
 # Create a window with the Surface screen
 screen_label = 'BytBot'
@@ -222,21 +224,21 @@ s_background = s_background.convert(screen)
 screen.blit(s_background, (0, 0))
 
 # Create a grid Surface
-s_grid = pygame.Surface((WIDTH, HEIGHT))
+s_grid = pygame.Surface((cell_width * CELL_HOR, cell_height * CELL_VER))
 s_grid = s_grid.convert(screen)
 s_grid.set_alpha(180)
-s_grid_x = 0
-s_grid_y = 0
+s_grid_x = (WIDTH - s_grid.get_width()) / 2
+s_grid_y = (HEIGHT - s_grid.get_height()) / 2
 
 # List to store cell coordinates
 grid = []
 
 # Constant of the cell border width
-CELL_LINE_WIDTH = 2
+CELL_LINE_WIDTH = 1
 draw_grid(True)
 
 # Stores the index of the starting location and the previous location
-last_loc = 112
+last_loc = 130
 
 # Stores the amount of times the player has made an action
 step = 0
