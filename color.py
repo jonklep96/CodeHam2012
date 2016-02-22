@@ -10,6 +10,7 @@ BOT = (151, 8, 8)
 
 # Themed Blue Colors
 BLUE = (40, 40, 100)
+LIGHTBLUE = (140, 140, 220)
 
 # Themed Green Colors
 BYT = (5, 90, 90)

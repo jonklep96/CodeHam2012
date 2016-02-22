@@ -15,21 +15,22 @@ class Enemy(unit.Unit):
         self.atk = 2
 
     # Make the AI choose the right direction
-    def get_move_dir(self, byt):
+    def get_move_dir(self, _byt):
 
-        byt_y = (byt.loc - (byt.loc % window_locals.CELL_HOR)) / window_locals.CELL_HOR
-        bot_y = (self.loc - (self.loc % window_locals.CELL_VER)) / window_locals.CELL_VER
+        _byt_x = _byt.loc // window_locals.CELL_VER
+        _bot_x = self.loc // window_locals.CELL_VER
 
-        if bot_y > byt_y:
-            print('Bot is Better')
-        else:
-            print('Byt is Better')
+        _byt_y = _byt.loc % window_locals.CELL_VER
+        _bot_y = self.loc % window_locals.CELL_VER
 
-        if self.rect.x < byt.rect.x:
-            return 1
-        elif self.rect.y > byt.rect.y:
+        print(str(self.loc) + ': (' + str(_bot_x) + ', ' + str(_bot_y) + ')')  # debug
+
+        if _bot_y > _byt_y:
             return 0
-        elif self.rect.x > byt.rect.x:
-            return 3
-        elif self.rect.y < byt.rect.y:
+        elif _bot_y < _byt_y:
             return 2
+        else:
+            if _bot_x < _byt_x:
+                return 1
+            elif _bot_x > _byt_x:
+                return 3

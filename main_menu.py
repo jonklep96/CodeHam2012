@@ -1,5 +1,6 @@
 import pygame
 import color
+import sys
 
 
 def start_menu(screen):
@@ -21,5 +22,7 @@ def start_menu(screen):
                 if pos[0] >= x or pos[1] >= y:
                     done = True
                     break
+            elif event.type == pygame.QUIT:
+                sys.exit()
         if done:
             break

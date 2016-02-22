@@ -47,19 +47,6 @@ class Cell(pygame.Rect):
         else:
             return False
 
-    def is_moveable(self, _index, _unit):
-
-        if isinstance(_unit, enemy.Enemy):
-            if _index == _unit.loc - 1 or _index == _unit.loc + CELL_VER:
-                if _index == _unit.loc + 1 or _index == _unit.loc - CELL_VER:
-                    return True
-        elif isinstance(_unit, player.Player):
-            if _index == _unit.loc - 1 or _index == _unit.loc + CELL_VER:
-                if _index == _unit.loc + 1 or _index == _unit.loc - CELL_VER:
-                    return True
-
-        return False
-
     def get_adjacent(self):
 
         ret = [0, 0, 0, 0]

@@ -24,9 +24,9 @@ def draw_grid(first_run):
                 grid.append(rect)
                 init_outer_border(grid_index)
             if grid[grid_index].on_border:
-                pygame.draw.rect(s_grid, color.OFF_WHITE, rect, GRID_CELL_WIDTH)
+                pygame.draw.rect(s_grid, color.OFF_WHITE, rect, CELL_LINE_WIDTH)
             else:
-                pygame.draw.rect(s_grid, color.WHITE, rect, GRID_CELL_WIDTH)
+                pygame.draw.rect(s_grid, color.WHITE, rect, CELL_LINE_WIDTH)
             grid_index += 1
 
 
@@ -42,13 +42,12 @@ def check_click(_pos, _step, _last_loc):
                         print(grid_index)  # debug cell index
                         _sel_cell = grid[grid_index]
 
-                        # Move the player
-                        byt.move(_sel_cell)
-
                         # Update the rect of the AI bots
                         for _bot in bot_list:
                             move_bot(_bot, _bot.get_move_dir(byt))
-                            print(_bot.loc)  # debug where the bot is
+
+                        # Move the player
+                        byt.move(_sel_cell)
 
                         # Draw the selectable locations
                         draw_adjacents(grid, _sel_cell)
@@ -64,7 +63,7 @@ def check_click(_pos, _step, _last_loc):
 def rect_contain(_rect, _pos):
 
     # Values to store clicking and drawing
-    padding_adjustment = GRID_CELL_WIDTH + 1
+    padding_adjustment = CELL_LINE_WIDTH + 1
 
     if _pos[0] > _rect.x + padding_adjustment:
         if _pos[0] < _rect.x + _rect.width - padding_adjustment:
@@ -109,16 +108,28 @@ def draw_adjacents(_grid, _cell):
     adj_cells = _grid[_cell.loc].get_adjacent()
 
     # Width of cell selection
-    sel_width = GRID_CELL_WIDTH + 2
+    sel_width = CELL_LINE_WIDTH + 2
 
-    if adj_cells[0] != -1 and not grid[adj_cells[0]].on_border:
+    if adj_cells[0] != -1 and not grid[adj_cells[0]].on_border and check_cell(adj_cells[0]):
+        pygame.draw.rect(screen, color.LIGHTBLUE, grid[adj_cells[0]].get_rect(), sel_width)
+    elif adj_cells[0] != -1 and not grid[adj_cells[0]].on_border:
         pygame.draw.rect(screen, color.BLUE, grid[adj_cells[0]].get_rect(), sel_width)
-    if adj_cells[1] != -1 and not grid[adj_cells[1]].on_border:
+
+    if adj_cells[1] != -1 and not grid[adj_cells[1]].on_border and check_cell(adj_cells[1]):
+        pygame.draw.rect(screen, color.LIGHTBLUE, grid[adj_cells[1]].get_rect(), sel_width)
+    elif adj_cells[1] != -1 and not grid[adj_cells[1]].on_border:
         pygame.draw.rect(screen, color.BLUE, grid[adj_cells[1]].get_rect(), sel_width)
-    if adj_cells[2] != -1 and not grid[adj_cells[2]].on_border:
+
+    if adj_cells[2] != -1 and not grid[adj_cells[2]].on_border and check_cell(adj_cells[2]):
+        pygame.draw.rect(screen, color.LIGHTBLUE, grid[adj_cells[2]].get_rect(), sel_width)
+    elif adj_cells[2] != -1 and not grid[adj_cells[2]].on_border:
         pygame.draw.rect(screen, color.BLUE, grid[adj_cells[2]].get_rect(), sel_width)
-    if adj_cells[3] != -1 and not grid[adj_cells[3]].on_border:
+
+    if adj_cells[3] != -1 and not grid[adj_cells[3]].on_border and check_cell(adj_cells[3]):
+        pygame.draw.rect(screen, color.LIGHTBLUE, grid[adj_cells[3]].get_rect(), sel_width)
+    elif adj_cells[3] != -1 and not grid[adj_cells[3]].on_border:
         pygame.draw.rect(screen, color.BLUE, grid[adj_cells[3]].get_rect(), sel_width)
+
     pygame.draw.rect(screen, color.YELLOW, _cell.get_rect(), sel_width + 1)
 
 
@@ -163,15 +174,28 @@ def draw_selector(_pos):
     _index = 0
     for _cell in grid:
         if rect_contain(_cell, _pos):
-            _sel_width = GRID_CELL_WIDTH + 2
+            _sel_width = CELL_LINE_WIDTH + 2
             pygame.draw.rect(screen, color.HOT_PINK, _cell.get_rect(), _sel_width)
             break
         _index += 1
 
 
+# Checks to see if there is a Unit in the cell
+def check_cell(_loc):
+
+    for _unit in bot_list:
+        if _loc == _unit.loc:
+            return True
+
+    return False
+
+
 # Initializes pygame and the mixer to prevent sound lag.
 pygame.mixer.pre_init(44100, -16, 2, 2048)
 pygame.init()
+
+# Start Music
+sound.play_music()
 
 CELL_HOR = window_locals.CELL_HOR
 CELL_VER = window_locals.CELL_VER
@@ -208,17 +232,14 @@ s_grid_y = 0
 grid = []
 
 # Constant of the cell border width
-GRID_CELL_WIDTH = 2
+CELL_LINE_WIDTH = 2
 draw_grid(True)
 
 # Stores the index of the starting location and the previous location
-last_loc = CELL_VER * 2 + OUTER_CELLS
+last_loc = 112
 
 # Stores the amount of times the player has made an action
 step = 0
-
-# Start Music
-sound.play_music()
 
 # Creating the groups for sprites. Items, BytBot - contains all characters, Bot - enemies
 item_list = pygame.sprite.Group()
@@ -227,7 +248,7 @@ bot_list = pygame.sprite.Group()
 byt_list = pygame.sprite.Group()
 
 # Create Characters - Initial
-byt = player.Player(grid[32], 'byt', 'Byt', 32)
+byt = player.Player(grid[last_loc], 'byt', 'Byt', last_loc)
 byt_list.add(byt)
 for i in range(1, 5):
     rand_loc = spawn_rand()
@@ -235,15 +256,16 @@ for i in range(1, 5):
     bot_list.add(bot)
 
 # Create items - initial
-spark = item.Item(grid[55], 'spark', 'Spark')  # debug
-heart = item.Item(grid[70], 'heart', 'Heart')  # debug
+spark = item.Item(grid[55], 'spark', 'Spark', 55)  # debug
+heart = item.Item(grid[70], 'heart', 'Heart', 70)  # debug
 item_list.add(spark, heart)  # debug
+for _item in item_list:
+    _item.set_rect(grid[_item.loc])
 
 while True:
     for event in pygame.event.get():
         if event.type == pygame.MOUSEBUTTONUP:
             pos = pygame.mouse.get_pos()
-            print(pos)  # debug mouse position
             t_list = check_click(pos, step, last_loc)
             step = t_list[0]
             last_loc = t_list[1]
